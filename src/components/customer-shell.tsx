@@ -1,0 +1,8 @@
+import { Link } from '@tanstack/react-router';
+import { Bot, CalendarPlus, Home, LayoutDashboard, Menu, UserRound } from 'lucide-react';
+import { Brand } from './brand';
+import { Button } from './ui/button';
+export function CustomerShell({children}:{children:React.ReactNode}){
+ const items=[{to:'/' as const,label:'Home',icon:Home},{to:'/assistant' as const,label:'Ask Boxie',icon:Bot},{to:'/book' as const,label:'Book',icon:CalendarPlus},{to:'/portal' as const,label:'My storage',icon:UserRound}];
+ return <div className="min-h-screen bg-background text-foreground"><header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur"><div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 lg:px-8"><Link to="/" aria-label="BoxHarbour home"><Brand/></Link><nav className="hidden items-center gap-1 md:flex">{items.map(i=><Button asChild variant="ghost" key={i.to}><Link to={i.to} activeProps={{className:'bg-accent text-accent-foreground'}}><i.icon/>{i.label}</Link></Button>)}<span className="mx-2 h-5 w-px bg-border"/><Button asChild variant="outline"><Link to="/staff"><LayoutDashboard/>Staff</Link></Button></nav><Button size="icon" variant="ghost" className="md:hidden" aria-label="Menu"><Menu/></Button></div></header><main className="pb-20 md:pb-0">{children}</main><nav className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-background px-1 py-1.5 md:hidden">{items.map(i=><Link key={i.to} to={i.to} activeProps={{className:'text-primary'}} inactiveProps={{className:'text-muted-foreground'}} className="flex min-w-0 flex-col items-center gap-1 py-1 text-[11px] font-medium"><i.icon className="size-5"/><span className="truncate">{i.label}</span></Link>)}</nav></div>
+}
