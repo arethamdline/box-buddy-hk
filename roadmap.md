@@ -5,4 +5,4 @@
 - [x] Nine-step booking and simulated payment flow
 - [x] Customer portal and return delivery flow
 - [x] Staff operations, bookings/calendar, deposits, and AI knowledge
-- [ ] Responsive preview verification and error cleanup
+- [x] Responsive preview verification and error cleanup
