@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as StaffRouteImport } from './routes/staff'
 import { Route as AssistantIndexRouteImport } from './routes/assistant.index'
 import { Route as AssistantThreadIdRouteImport } from './routes/assistant.$threadId'
 
@@ -30,6 +31,11 @@ const PortalRoute = PortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssistantIndexRoute = AssistantIndexRouteImport.update({
   id: '/assistant/',
   path: '/assistant/',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/portal': typeof PortalRoute
+  '/staff': typeof StaffRoute
   '/assistant/$threadId': typeof AssistantThreadIdRoute
   '/assistant/': typeof AssistantIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/portal': typeof PortalRoute
+  '/staff': typeof StaffRoute
   '/assistant/$threadId': typeof AssistantThreadIdRoute
   '/assistant': typeof AssistantIndexRoute
 }
@@ -60,19 +68,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/portal': typeof PortalRoute
+  '/staff': typeof StaffRoute
   '/assistant/$threadId': typeof AssistantThreadIdRoute
   '/assistant/': typeof AssistantIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/book' | '/portal' | '/assistant/$threadId' | '/assistant/'
+  fullPaths:
+    | '/'
+    | '/book'
+    | '/portal'
+    | '/staff'
+    | '/assistant/$threadId'
+    | '/assistant/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/book' | '/portal' | '/assistant/$threadId' | '/assistant'
+  to:
+    '/' | '/book' | '/portal' | '/staff' | '/assistant/$threadId' | '/assistant'
   id:
     | '__root__'
     | '/'
     | '/book'
     | '/portal'
+    | '/staff'
     | '/assistant/$threadId'
     | '/assistant/'
   fileRoutesById: FileRoutesById
@@ -81,6 +98,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookRoute: typeof BookRoute
   PortalRoute: typeof PortalRoute
+  StaffRoute: typeof StaffRoute
   AssistantThreadIdRoute: typeof AssistantThreadIdRoute
   AssistantIndexRoute: typeof AssistantIndexRoute
 }
@@ -108,6 +126,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assistant/': {
       id: '/assistant/'
       path: '/assistant'
@@ -129,6 +154,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookRoute: BookRoute,
   PortalRoute: PortalRoute,
+  StaffRoute: StaffRoute,
   AssistantThreadIdRoute: AssistantThreadIdRoute,
   AssistantIndexRoute: AssistantIndexRoute,
 }
