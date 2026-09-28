@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep all prototype business records in `src/data/mock-data.ts`; this keeps UI screens backend-replaceable.
+- Customer and staff experiences use a shared route-aware shell, while each major workflow has its own TanStack route for direct access.
+- AI assistant threads are mock-only and persisted in browser localStorage; no server AI or database is used in this prototype.
