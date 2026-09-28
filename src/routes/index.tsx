@@ -1,24 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { ArrowRight, Bot, Box, CalendarClock, ChevronRight, MapPin, PackageCheck, ShieldCheck, Truck } from 'lucide-react';
+import { CustomerShell } from '@/components/customer-shell';
+import { Brand } from '@/components/brand';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { StatusBadge } from '@/components/status-badge';
+import { plans } from '@/data/mock-data';
+export const Route=createFileRoute('/')({head:()=>({meta:[{title:'BoxHarbour — Storage made simple in Hong Kong'},{name:'description',content:'Book and manage secure storage boxes and units across Hong Kong.'},{property:'og:title',content:'BoxHarbour — Storage made simple'},{property:'og:description',content:'Book and manage secure storage boxes and units across Hong Kong.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Home});
+function Home(){return <CustomerShell><section className="border-b bg-primary text-primary-foreground"><div className="mx-auto max-w-7xl px-4 py-12 lg:px-8 lg:py-16"><div className="max-w-3xl"><div className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-3 py-1.5 text-sm"><ShieldCheck className="size-4"/>Secure storage, local support</div><h1 className="font-display text-4xl font-extrabold leading-tight md:text-6xl">More room for life in Hong Kong.</h1><p className="mt-5 max-w-2xl text-lg text-primary-foreground/80">We collect, store and return your things—or give you a private unit you can visit anytime.</p><div className="mt-8 flex flex-wrap gap-3"><Button asChild size="lg" className="bg-accent-strong text-foreground hover:bg-accent-strong/90"><Link to="/book">Book storage <ArrowRight/></Link></Button><Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"><Link to="/assistant"><Bot/>Ask Boxie</Link></Button></div></div></div></section><div className="mx-auto max-w-7xl space-y-10 px-4 py-10 lg:px-8"><section><div className="mb-5 flex items-end justify-between"><div><p className="text-sm font-semibold text-primary">STORAGE YOUR WAY</p><h2 className="font-display text-2xl font-bold">Choose what fits</h2></div><Link to="/book" className="hidden text-sm font-semibold text-primary sm:block">Compare all plans →</Link></div><div className="grid gap-4 md:grid-cols-3">{plans.map((p,i)=><Card key={p.id} className="rounded-lg shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><CardContent className="p-5"><div className="mb-5 grid size-11 place-items-center rounded-md bg-accent text-primary">{i===0?<Box/>:i===1?<PackageCheck/>:<MapPin/>}</div><div className="flex items-start justify-between gap-3"><div><h3 className="font-display text-lg font-bold">{p.name}</h3><p className="text-sm text-muted-foreground">{p.zh}</p></div>{i===0&&<StatusBadge>Popular</StatusBadge>}</div><p className="mt-4 text-sm text-muted-foreground">{p.note}</p><div className="mt-5 flex items-end justify-between"><p><span className="font-display text-2xl font-bold">HK${p.price}</span><span className="text-xs text-muted-foreground"> / {p.unit}</span></p><Button asChild size="icon" variant="ghost"><Link to="/book" aria-label={`Choose ${p.name}`}><ChevronRight/></Link></Button></div></CardContent></Card>)}</div></section><section className="grid gap-4 md:grid-cols-[1.4fr_1fr]"><Card className="overflow-hidden rounded-lg border-0 bg-foreground text-background shadow-none"><CardContent className="grid gap-7 p-6 md:grid-cols-[1fr_auto] md:items-center"><div><div className="mb-4 grid size-11 place-items-center rounded-md bg-background/10"><CalendarClock/></div><h2 className="font-display text-2xl font-bold">Need your boxes back?</h2><p className="mt-2 text-sm text-background/70">Schedule a return delivery in under a minute.</p></div><Button asChild className="bg-background text-foreground hover:bg-background/90"><Link to="/portal">Open my storage <ArrowRight/></Link></Button></CardContent></Card><Card className="rounded-lg bg-warning-soft shadow-none"><CardContent className="p-6"><Truck className="mb-4 text-warning-strong"/><h2 className="font-display text-xl font-bold">We cover all 18 districts</h2><p className="mt-2 text-sm text-muted-foreground">Pickup and delivery across Hong Kong Island, Kowloon and the New Territories.</p></CardContent></Card></section><footer className="flex flex-col gap-4 border-t py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between"><Brand/><p>Prototype experience · No real payments are processed</p></footer></div></CustomerShell>}
