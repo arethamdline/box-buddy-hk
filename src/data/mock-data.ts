@@ -19,3 +19,21 @@ export const payments = [
 export const knowledge = [
   { category:'Storage Plans', title:'Door-to-door box sizes', summary:'Standard 60L boxes and XL 95L boxes.', enabled:true }, { category:'Pricing', title:'Monthly box pricing', summary:'From HK$79 per box each month.', enabled:true }, { category:'Rental Terms', title:'Minimum rental period', summary:'One month minimum; flexible extensions.', enabled:true }, { category:'Prohibited Items', title:'Items we cannot store', summary:'Food, liquids, plants, weapons and hazardous materials.', enabled:true }, { category:'Access Hours', title:'Self-storage opening times', summary:'Selected facilities offer 24/7 smart access.', enabled:false }, { category:'Pickup / Delivery', title:'Service areas', summary:'Hong Kong Island, Kowloon and New Territories.', enabled:true }, { category:'Deposit Policy', title:'Refund timeline', summary:'Reviewed within 3 business days after return.', enabled:true }, { category:'Frequently Asked Questions', title:'Can I add more boxes later?', summary:'Yes, subject to availability and a new pickup slot.', enabled:true },
 ];
+export const boxItems = [
+  { id: 'small', name: 'Small box', size: '35L', price: 30 },
+  { id: 'medium', name: 'Medium box', size: '60L', price: 40 },
+  { id: 'large', name: 'Large box', size: '95L', price: 60 },
+  { id: 'xl', name: 'Extra-large box', size: '120L', price: 45, promo: true },
+  { id: 'luggage', name: 'Large luggage', size: '≤ 32"', price: 60 },
+];
+export const unitSizes = { locker: [{ id: 'Small', area: 12, price: 328 }, { id: 'Medium', area: 20, price: 428 }, { id: 'Large', area: 32, price: 568 }], room: [{ id: 'Small', area: 12, price: 688 }, { id: 'Medium', area: 20, price: 988 }, { id: 'Large', area: 32, price: 1388 }] };
+export const fees = { pickup: 100, parking: 80, promoDiscount: 0.05, promoMinTerm: 3 };
+export const specialOffer = { items: { xl: 6, luggage: 1 } as Record<string, number>, term: 3 };
+export const locations = [
+  { id: 'kt', name: 'Kwun Tong Hub', type: 'Warehouse & lockers', district: 'Kwun Tong', address: '88 Hoi Bun Road, Kwun Tong', mtr: 'Kwun Tong', hours: 'Open 24/7', km: 1.2 },
+  { id: 'np', name: 'North Point', type: 'Drop-off point', district: 'Eastern', address: '18 Java Road, North Point', mtr: 'North Point', hours: '09:00–21:00', km: 3.8 },
+  { id: 'cw', name: 'Chai Wan', type: 'Storage rooms', district: 'Eastern', address: '12 Lee Chung Street, Chai Wan', mtr: 'Chai Wan', hours: 'Open 24/7', km: 6.4 },
+  { id: 'ksl', name: 'Kwai Chung', type: 'Warehouse & lockers', district: 'Kwai Tsing', address: '223 Wo Yi Hop Road, Kwai Chung', mtr: 'Kwai Hing', hours: 'Open 24/7', km: 9.1 },
+  { id: 'st', name: 'Sha Tin', type: 'Drop-off point', district: 'Sha Tin', address: '1 Yuen Shun Circuit, Sha Tin', mtr: 'Shek Mun', hours: '10:00–20:00', km: 11.5 },
+  { id: 'tm', name: 'Tuen Mun', type: 'Storage rooms', district: 'Tuen Mun', address: '8 San On Street, Tuen Mun', mtr: 'Tuen Mun', hours: 'Open 24/7', km: 24.3 },
+];
