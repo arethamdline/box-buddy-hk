@@ -64,7 +64,7 @@
   --color-accent-strong: var(--accent-strong);
   --color-accent-strong-foreground: var(--accent-strong-foreground);
   --color-accent-strong-ink: var(--accent-strong-ink);
-  --shadow-boxie: var(--shadow-boxie);
+  --shadow-storage: var(--shadow-storage);
   --color-success-soft: var(--success-soft);
   --color-success-strong: var(--success-strong);
   --color-warning-soft: var(--warning-soft);
@@ -92,7 +92,7 @@
   --accent-strong: oklch(0.72 0.17 58);
   --accent-strong-foreground: oklch(0.2 0.04 50);
   --accent-strong-ink: oklch(0.52 0.14 50);
-  --shadow-boxie: 0 8px 24px -8px oklch(0.72 0.17 58 / 0.55);
+  --shadow-storage: 0 8px 24px -8px oklch(0.72 0.17 58 / 0.55);
   --success-soft: oklch(0.95 0.045 165);
   --success-strong: oklch(0.4 0.12 165);
   --warning-soft: oklch(0.96 0.055 75);

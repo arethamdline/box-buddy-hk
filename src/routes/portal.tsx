@@ -1,19 +1,426 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { CalendarClock, Check, ChevronRight, CircleDollarSign, PackageCheck, RotateCcw, Truck, type LucideIcon } from 'lucide-react';
-import { CustomerShell } from '@/components/customer-shell';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { StatusBadge } from '@/components/status-badge';
-import { payments, rentals, slots } from '@/data/mock-data';
-import { cn } from '@/lib/utils';
-export const Route=createFileRoute('/portal')({head:()=>({meta:[{title:'My storage — BoxHarbour'},{name:'description',content:'Manage active rentals, deliveries, payments and deposits.'},{property:'og:title',content:'My storage — BoxHarbour'},{property:'og:description',content:'Manage BoxHarbour rentals, deliveries, payments and deposits.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:Portal});
-function Portal(){const [tab,setTab]=useState('Overview');const [request,setRequest]=useState(false);const [done,setDone]=useState(false);const [slot,setSlot]=useState('14:00–16:00');const tabs=['Overview','Rentals','Schedule','Payments','Deposits'];return <CustomerShell><div className="mx-auto max-w-6xl px-4 py-8 lg:px-8"><div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4"><div><p className="text-sm text-muted-foreground">Good afternoon</p><h1 className="font-display text-3xl font-bold">Mandy’s storage</h1></div><Button onClick={()=>setRequest(true)}><Truck/>Request return</Button></div><div className="mt-7 flex gap-1 overflow-x-auto border-b">{tabs.map(t=><button onClick={()=>setTab(t)} key={t} className={cn('shrink-0 border-b-2 px-4 py-3 text-sm font-semibold',tab===t?'border-primary text-primary':'border-transparent text-muted-foreground')}>{t}</button>)}</div><div className="mt-7">{tab==='Overview'&&<Overview setTab={setTab} request={()=>setRequest(true)}/>} {tab==='Rentals'&&<Rentals request={()=>setRequest(true)}/>} {tab==='Schedule'&&<Schedule/>} {tab==='Payments'&&<Payments/>} {tab==='Deposits'&&<Deposits/>}</div></div><Dialog open={request} onOpenChange={setRequest}><DialogContent><DialogHeader><DialogTitle>Request your boxes back</DialogTitle><DialogDescription>Choose an available return delivery window.</DialogDescription></DialogHeader>{done?<div className="py-6 text-center"><span className="mx-auto grid size-14 place-items-center rounded-full bg-success-soft text-success-strong"><Check/></span><h3 className="mt-4 font-bold">Delivery requested</h3><p className="mt-1 text-sm text-muted-foreground">2 October 2026 · {slot}</p></div>:<div className="space-y-3"><label className="block text-sm font-semibold">Delivery date</label><input type="date" defaultValue="2026-10-02" className="h-11 w-full rounded-md border px-3"/><div className="grid grid-cols-2 gap-2">{slots.slice(0,4).map(s=><button disabled={!s.available} onClick={()=>setSlot(s.time)} key={s.time} className={cn('rounded-md border p-3 text-sm',!s.available&&'bg-muted opacity-50',slot===s.time&&s.available&&'border-2 border-primary bg-accent')}>{s.time}<span className="mt-1 block text-xs text-muted-foreground">{s.label}</span></button>)}</div></div>}<DialogFooter>{done?<Button onClick={()=>setRequest(false)}>Done</Button>:<Button onClick={()=>setDone(true)}>Confirm return</Button>}</DialogFooter></DialogContent></Dialog></CustomerShell>}
-function Overview({setTab,request}:{setTab:(x:string)=>void;request:()=>void}){const metrics:{Icon:LucideIcon;value:string;label:string}[]=[{Icon:PackageCheck,value:'2',label:'Active rentals'},{Icon:CalendarClock,value:'1',label:'Upcoming delivery'},{Icon:CircleDollarSign,value:'HK$500',label:'Deposit held'}];return <div className="space-y-6"><div className="grid gap-4 sm:grid-cols-3">{metrics.map(({Icon,value,label})=><Card key={label} className="rounded-lg shadow-sm"><CardContent className="p-5"><Icon className="size-5 text-primary"/><p className="mt-5 font-display text-2xl font-bold">{value}</p><p className="text-sm text-muted-foreground">{label}</p></CardContent></Card>)}</div><Card className="rounded-lg shadow-sm"><CardContent className="p-5"><div className="flex items-start justify-between"><div><p className="text-sm font-semibold text-primary">NEXT DELIVERY</p><h2 className="mt-1 font-display text-xl font-bold">Your 6 boxes are coming back</h2></div><StatusBadge>Confirmed</StatusBadge></div><div className="mt-5 grid gap-3 text-sm sm:grid-cols-3"><p><span className="block text-muted-foreground">Date</span>2 October 2026</p><p><span className="block text-muted-foreground">Time</span>14:00–16:00</p><p><span className="block text-muted-foreground">Address</span>18 Java Road, North Point</p></div></CardContent></Card><SectionTitle title="Active rentals" action="View all" onClick={()=>setTab('Rentals')}/><div className="grid gap-4 md:grid-cols-2">{rentals.map(r=><RentalCard key={r.id} r={r} request={request}/>)}</div></div>}
-function SectionTitle({title,action,onClick}:{title:string;action?:string;onClick?:()=>void}){return <div className="flex items-center justify-between"><h2 className="font-display text-xl font-bold">{title}</h2>{action&&<Button variant="ghost" onClick={onClick}>{action}<ChevronRight/></Button>}</div>}
-function RentalCard({r,request}:{r:any;request:()=>void}){return <Card className="rounded-lg shadow-sm"><CardContent className="p-5"><div className="flex items-start justify-between"><div><p className="text-xs text-muted-foreground">{r.id}</p><h3 className="mt-1 font-bold">{r.plan}</h3></div><StatusBadge>{r.status}</StatusBadge></div><p className="mt-3 text-sm text-muted-foreground">{r.detail}</p><div className="mt-5 flex justify-between border-t pt-4"><p className="text-sm"><span className="block text-xs text-muted-foreground">Started</span>{r.start}</p><Button variant="outline" size="sm" onClick={request}><RotateCcw/>Request return</Button></div></CardContent></Card>}
-function Rentals({request}:{request:()=>void}){return <div><SectionTitle title="Active rentals"/><div className="mt-4 grid gap-4 md:grid-cols-2">{rentals.map(r=><RentalCard key={r.id} r={r} request={request}/>)}</div></div>}
-function Schedule(){return <div><SectionTitle title="Pickup & delivery schedule"/><div className="mt-4 rounded-lg border bg-card"><div className="flex gap-4 p-5"><span className="grid size-11 place-items-center rounded-md bg-accent text-primary"><Truck/></span><div><div className="flex gap-2"><h3 className="font-bold">Return delivery</h3><StatusBadge>Confirmed</StatusBadge></div><p className="mt-1 text-sm text-muted-foreground">2 Oct 2026 · 14:00–16:00</p><p className="mt-2 text-sm">6 boxes to 18 Java Road, North Point</p></div></div></div></div>}
-function Payments(){return <div><SectionTitle title="Payment history"/><div className="mt-4 overflow-x-auto rounded-lg border bg-card"><table className="w-full min-w-[620px] text-sm"><thead className="bg-muted/60 text-left text-muted-foreground"><tr>{['Reference','Date','Item','Method','Amount','Status'].map(x=><th className="px-4 py-3 font-medium" key={x}>{x}</th>)}</tr></thead><tbody>{payments.map(p=><tr className="border-t" key={p.id}><td className="px-4 py-4 font-medium">{p.id}</td><td className="px-4">{p.date}</td><td className="px-4">{p.item}</td><td className="px-4">{p.method}</td><td className="px-4 font-semibold">{p.amount}</td><td className="px-4"><StatusBadge>{p.status}</StatusBadge></td></tr>)}</tbody></table></div></div>}
-function Deposits(){return <div className="space-y-6"><SectionTitle title="Deposit tracker"/><Card className="rounded-lg shadow-sm"><CardContent className="p-6"><div className="flex items-start justify-between"><div><p className="text-xs text-muted-foreground">BH-23802 · Personal locker</p><h3 className="mt-1 font-bold">HK$500.00 deposit</h3></div><StatusBadge>Held</StatusBadge></div><div className="mt-7 flex items-center">{['Held','Under Review','Refunded'].map((x,i)=><div key={x} className="flex flex-1 items-center last:flex-none"><div><span className={cn('grid size-8 place-items-center rounded-full text-xs font-bold',i===0?'bg-primary text-primary-foreground':'bg-muted text-muted-foreground')}>{i+1}</span><p className="mt-2 text-xs font-medium">{x}</p></div>{i<2&&<div className="mx-2 h-0.5 flex-1 bg-border"/>}</div>)}</div></CardContent></Card><Card className="rounded-lg border-warning-strong/20 bg-warning-soft shadow-none"><CardContent className="p-6"><div className="flex justify-between"><div><p className="text-xs text-warning-strong">COMPLETED RENTAL EXAMPLE</p><h3 className="mt-1 font-bold">Partial deposit refund</h3></div><StatusBadge>Refunded</StatusBadge></div><dl className="mt-5 space-y-3 text-sm"><div className="flex justify-between"><dt>Original deposit</dt><dd>HK$500.00</dd></div><div className="flex justify-between text-destructive"><dt>Deduction</dt><dd>− HK$80.00</dd></div><div className="rounded-md bg-background/70 p-3"><dt className="font-semibold">Deduction reason</dt><dd className="mt-1 text-muted-foreground">Replacement lid required after return inspection.</dd></div><div className="flex justify-between border-t pt-3 font-bold"><dt>Final refund</dt><dd>HK$420.00</dd></div></dl></CardContent></Card></div>}
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import {
+  CalendarClock,
+  Check,
+  ChevronRight,
+  CircleDollarSign,
+  Circle,
+  PackageCheck,
+  RotateCcw,
+  Truck,
+  type LucideIcon,
+} from "lucide-react";
+import { CustomerShell } from "@/components/customer-shell";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { StatusBadge } from "@/components/status-badge";
+import { payments, rentals, slots } from "@/data/mock-data";
+import { cn } from "@/lib/utils";
+export const Route = createFileRoute("/portal")({
+  head: () => ({
+    meta: [
+      { title: "My storage — STORAGE" },
+      { name: "description", content: "Manage active rentals, deliveries, payments and deposits." },
+      { property: "og:title", content: "My storage — STORAGE" },
+      {
+        property: "og:description",
+        content: "Manage STORAGE rentals, deliveries, payments and deposits.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Portal,
+});
+function Portal() {
+  const [tab, setTab] = useState("Overview");
+  const [request, setRequest] = useState(false);
+  const [done, setDone] = useState(false);
+  const [slot, setSlot] = useState("14:00–16:00");
+  const tabs = ["Overview", "Rentals", "Schedule", "Payments", "Deposits"];
+  return (
+    <CustomerShell>
+      <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Good afternoon</p>
+            <h1 className="font-display text-3xl font-bold">Mandy’s storage</h1>
+          </div>
+          <Button onClick={() => setRequest(true)}>
+            <Truck />
+            Request return
+          </Button>
+        </div>
+        <div className="mt-7 flex gap-1 overflow-x-auto border-b">
+          {tabs.map((t) => (
+            <button
+              onClick={() => setTab(t)}
+              key={t}
+              className={cn(
+                "shrink-0 border-b-2 px-4 py-3 text-sm font-semibold",
+                tab === t
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground",
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <div className="mt-7">
+          {tab === "Overview" && <Overview setTab={setTab} request={() => setRequest(true)} />}{" "}
+          {tab === "Rentals" && <Rentals request={() => setRequest(true)} />}{" "}
+          {tab === "Schedule" && <Schedule />} {tab === "Payments" && <Payments />}{" "}
+          {tab === "Deposits" && <Deposits />}
+        </div>
+      </div>
+      <Dialog open={request} onOpenChange={setRequest}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request your boxes back</DialogTitle>
+            <DialogDescription>Choose an available return delivery window.</DialogDescription>
+          </DialogHeader>
+          {done ? (
+            <div className="py-6 text-center">
+              <span className="mx-auto grid size-14 place-items-center rounded-full bg-success-soft text-success-strong">
+                <Check />
+              </span>
+              <h3 className="mt-4 font-bold">Delivery requested</h3>
+              <p className="mt-1 text-sm text-muted-foreground">2 October 2026 · {slot}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold">Delivery date</label>
+              <input
+                type="date"
+                defaultValue="2026-10-02"
+                className="h-11 w-full rounded-md border px-3"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                {slots.slice(0, 4).map((s) => (
+                  <button
+                    disabled={!s.available}
+                    onClick={() => setSlot(s.time)}
+                    key={s.time}
+                    className={cn(
+                      "rounded-md border p-3 text-sm",
+                      !s.available && "bg-muted opacity-50",
+                      slot === s.time && s.available && "border-2 border-primary bg-accent",
+                    )}
+                  >
+                    {s.time}
+                    <span className="mt-1 block text-xs text-muted-foreground">{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            {done ? (
+              <Button onClick={() => setRequest(false)}>Done</Button>
+            ) : (
+              <Button onClick={() => setDone(true)}>Confirm return</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </CustomerShell>
+  );
+}
+function Overview({ setTab, request }: { setTab: (x: string) => void; request: () => void }) {
+  const metrics: { Icon: LucideIcon; value: string; label: string }[] = [
+    { Icon: PackageCheck, value: "2", label: "Active rentals" },
+    { Icon: CalendarClock, value: "1", label: "Upcoming delivery" },
+    { Icon: CircleDollarSign, value: "HK$500", label: "Deposit held" },
+  ];
+  return (
+    <div className="space-y-6">
+      <Card className="rounded-lg shadow-sm">
+        <CardContent className="p-5">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-semibold text-primary">UPCOMING DELIVERY / PICKUP</p>
+              <h2 className="mt-1 font-display text-xl font-bold">Your 6 boxes are coming back</h2>
+            </div>
+            <StatusBadge>Scheduled</StatusBadge>
+          </div>
+          <div className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
+            <p>
+              <span className="block text-muted-foreground">Date</span>12 October 2026
+            </p>
+            <p>
+              <span className="block text-muted-foreground">Time</span>14:00–16:00
+            </p>
+            <p>
+              <span className="block text-muted-foreground">Address</span>18 Java Road, North Point
+            </p>
+          </div>
+          <ol className="mt-6 grid gap-4 border-t pt-5 sm:grid-cols-4">
+            {[
+              { label: "Scheduled for pickup", detail: "21 Aug · 09:00", state: "done" },
+              { label: "On the way to warehouse", detail: "Pickup complete", state: "done" },
+              { label: "Arrived at warehouse", detail: "21 Aug", state: "done" },
+              { label: "Stored for 42 days", detail: "Retrieval · 12 Oct", state: "current" },
+            ].map((status) => (
+              <li key={status.label} className="flex items-start gap-2 text-sm">
+                <span
+                  className={cn(
+                    "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full",
+                    status.state === "done"
+                      ? "bg-success-soft text-success-strong"
+                      : "bg-primary text-primary-foreground",
+                  )}
+                >
+                  <Circle className="size-2.5 fill-current" />
+                </span>
+                <span>
+                  <span className="block font-medium">{status.label}</span>
+                  <span className="text-xs text-muted-foreground">{status.detail}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </CardContent>
+      </Card>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {metrics.map(({ Icon, value, label }) => (
+          <Card key={label} className="rounded-lg shadow-sm">
+            <CardContent className="p-5">
+              <Icon className="size-5 text-primary" />
+              <p className="mt-5 font-display text-2xl font-bold">{value}</p>
+              <p className="text-sm text-muted-foreground">{label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <SectionTitle title="Active rentals" action="View all" onClick={() => setTab("Rentals")} />
+      <div className="grid gap-4 md:grid-cols-2">
+        {rentals.map((r) => (
+          <RentalCard key={r.id} r={r} request={request} />
+        ))}
+      </div>
+    </div>
+  );
+}
+function SectionTitle({
+  title,
+  action,
+  onClick,
+}: {
+  title: string;
+  action?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="font-display text-xl font-bold">{title}</h2>
+      {action && (
+        <Button variant="ghost" onClick={onClick}>
+          {action}
+          <ChevronRight />
+        </Button>
+      )}
+    </div>
+  );
+}
+function RentalCard({ r, request }: { r: (typeof rentals)[number]; request: () => void }) {
+  return (
+    <Card className="rounded-lg shadow-sm">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">{r.id}</p>
+            <h3 className="mt-1 font-bold">{r.plan}</h3>
+          </div>
+          <StatusBadge>{r.status}</StatusBadge>
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground">{r.detail}</p>
+        <div className="mt-5 flex justify-between border-t pt-4">
+          <p className="text-sm">
+            <span className="block text-xs text-muted-foreground">Started</span>
+            {r.start}
+          </p>
+          <Button variant="outline" size="sm" onClick={request}>
+            <RotateCcw />
+            Request return
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+function Rentals({ request }: { request: () => void }) {
+  return (
+    <div>
+      <SectionTitle title="Active rentals" />
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {rentals.map((r) => (
+          <RentalCard key={r.id} r={r} request={request} />
+        ))}
+      </div>
+    </div>
+  );
+}
+function Schedule() {
+  return (
+    <div>
+      <SectionTitle title="Pickup & delivery schedule" />
+      <div className="mt-4 rounded-lg border bg-card">
+        <div className="flex gap-4 p-5">
+          <span className="grid size-11 place-items-center rounded-md bg-accent text-primary">
+            <Truck />
+          </span>
+          <div>
+            <div className="flex gap-2">
+              <h3 className="font-bold">Return delivery</h3>
+              <StatusBadge>Confirmed</StatusBadge>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">2 Oct 2026 · 14:00–16:00</p>
+            <p className="mt-2 text-sm">6 boxes to 18 Java Road, North Point</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function Payments() {
+  return (
+    <div>
+      <SectionTitle title="Payment history" />
+      <div className="mt-4 space-y-3 md:hidden">
+        {payments.map((p) => (
+          <article key={p.id} className="rounded-lg border bg-card p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground">{p.date}</p>
+                <p className="mt-1 font-semibold">{p.item}</p>
+              </div>
+              <p className="shrink-0 font-display text-lg font-bold">{p.amount}</p>
+            </div>
+            <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t pt-3 text-sm">
+              <div>
+                <dt className="text-xs text-muted-foreground">Reference</dt>
+                <dd className="mt-0.5 font-medium">{p.id}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Method</dt>
+                <dd className="mt-0.5 font-medium">{p.method}</dd>
+              </div>
+              <div className="col-span-2 flex items-center justify-between">
+                <dt className="text-xs text-muted-foreground">Status</dt>
+                <dd>
+                  <StatusBadge>{p.status}</StatusBadge>
+                </dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <div className="mt-4 hidden overflow-x-auto rounded-lg border bg-card md:block">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/60 text-left text-muted-foreground">
+            <tr>
+              {["Reference", "Date", "Item", "Method", "Amount", "Status"].map((x) => (
+                <th className="px-4 py-3 font-medium" key={x}>
+                  {x}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {payments.map((p) => (
+              <tr className="border-t" key={p.id}>
+                <td className="px-4 py-4 font-medium">{p.id}</td>
+                <td className="px-4">{p.date}</td>
+                <td className="px-4">{p.item}</td>
+                <td className="px-4">{p.method}</td>
+                <td className="px-4 font-semibold">{p.amount}</td>
+                <td className="px-4">
+                  <StatusBadge>{p.status}</StatusBadge>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+function Deposits() {
+  return (
+    <div className="space-y-6">
+      <SectionTitle title="Deposit tracker" />
+      <Card className="rounded-lg shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">BH-23802 · Personal locker</p>
+              <h3 className="mt-1 font-bold">HK$500.00 deposit</h3>
+            </div>
+            <StatusBadge>Held</StatusBadge>
+          </div>
+          <div className="mt-7 flex items-center">
+            {["Held", "Under Review", "Refunded"].map((x, i) => (
+              <div key={x} className="flex flex-1 items-center last:flex-none">
+                <div>
+                  <span
+                    className={cn(
+                      "grid size-8 place-items-center rounded-full text-xs font-bold",
+                      i === 0
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <p className="mt-2 text-xs font-medium">{x}</p>
+                </div>
+                {i < 2 && <div className="mx-2 h-0.5 flex-1 bg-border" />}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="rounded-lg border-warning-strong/20 bg-warning-soft shadow-none">
+        <CardContent className="p-6">
+          <div className="flex justify-between">
+            <div>
+              <p className="text-xs text-warning-strong">COMPLETED RENTAL EXAMPLE</p>
+              <h3 className="mt-1 font-bold">Partial deposit refund</h3>
+            </div>
+            <StatusBadge>Refunded</StatusBadge>
+          </div>
+          <dl className="mt-5 space-y-3 text-sm">
+            <div className="flex justify-between">
+              <dt>Original deposit</dt>
+              <dd>HK$500.00</dd>
+            </div>
+            <div className="flex justify-between text-destructive">
+              <dt>Deduction</dt>
+              <dd>− HK$80.00</dd>
+            </div>
+            <div className="rounded-md bg-background/70 p-3">
+              <dt className="font-semibold">Deduction reason</dt>
+              <dd className="mt-1 text-muted-foreground">
+                Replacement lid required after return inspection.
+              </dd>
+            </div>
+            <div className="flex justify-between border-t pt-3 font-bold">
+              <dt>Final refund</dt>
+              <dd>HK$420.00</dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

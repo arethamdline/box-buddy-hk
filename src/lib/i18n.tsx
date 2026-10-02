@@ -6,7 +6,7 @@ export const languages: { id: Lang; label: string; short: string }[] = [
   { id: 'zh-Hant', label: '繁體中文', short: '繁' },
   { id: 'zh-Hans', label: '简体中文', short: '简' },
 ];
-const KEY = 'boxharbour-lang';
+const KEY = 'storage-lang';
 let current: Lang = 'en';
 const listeners = new Set<() => void>();
 if (typeof window !== 'undefined') {
@@ -26,7 +26,7 @@ export function useLang() {
 
 // [繁體, 简体] keyed by English source text
 const dict: Record<string, [string, string]> = {
-  Home: ['首頁', '首页'], 'Ask Boxie': ['問 Boxie', '问 Boxie'], Book: ['預約', '预约'], 'My storage': ['我的倉', '我的仓'], Staff: ['職員', '职员'], Language: ['語言', '语言'],
+  Home: ['首頁', '首页'], 'Ask Bot': ['問 Bot', '问 Bot'], Book: ['預約', '预约'], 'My storage': ['我的倉', '我的仓'], Staff: ['職員', '职员'], Language: ['語言', '语言'],
   'Secure storage, local support': ['安全儲存・本地支援', '安全储存・本地支持'],
   'More room for life in Hong Kong.': ['為香港生活騰出更多空間。', '为香港生活腾出更多空间。'],
   'We collect, store and return your things—or give you a private unit you can visit anytime.': ['我們上門收取、儲存及送還你的物品，或提供可隨時到訪的私人倉位。', '我们上门收取、储存及送还你的物品，或提供可随时到访的私人仓位。'],
@@ -73,7 +73,7 @@ const dict: Record<string, [string, string]> = {
   'Payment history': ['付款記錄', '付款记录'], Reference: ['參考編號', '参考编号'], Item: ['項目', '项目'], Method: ['方式', '方式'], Amount: ['金額', '金额'], Status: ['狀態', '状态'], 'Refundable deposit': ['可退按金', '可退押金'],
   'Deposit tracker': ['按金進度', '押金进度'], 'deposit': ['按金', '押金'], 'COMPLETED RENTAL EXAMPLE': ['已完成租用示例', '已完成租用示例'], 'Partial deposit refund': ['部分退還按金', '部分退还押金'], 'Original deposit': ['原本按金', '原本押金'], Deduction: ['扣除', '扣除'], 'Deduction reason': ['扣除原因', '扣除原因'], 'Replacement lid required after return inspection.': ['退還檢查後需更換箱蓋。', '退还检查后需更换箱盖。'], 'Final refund': ['最終退款', '最终退款'],
   // assistant
-  'New conversation': ['新對話', '新对话'], 'Saved in this browser': ['儲存於此瀏覽器', '保存于此浏览器'], 'Boxie storage assistant': ['Boxie 儲存助手', 'Boxie 储存助手'], 'Multilingual help': ['多語言支援', '多语言支持'], 'Ask about storage…': ['查詢儲存服務…', '查询储存服务…'], 'Sample answers for prototype use only': ['示範答案，僅供原型使用', '示范答案，仅供原型使用'],
+  'New conversation': ['新對話', '新对话'], 'Saved in this browser': ['儲存於此瀏覽器', '保存于此浏览器'], 'STORAGE assistant': ['STORAGE 儲存助手', 'STORAGE 储存助手'], 'Multilingual help': ['多語言支援', '多语言支持'], 'Ask about storage…': ['查詢儲存服務…', '查询储存服务…'], 'Sample answers for prototype use only': ['示範答案，僅供原型使用', '示范答案，仅供原型使用'],
   'Prices & sizes': ['價格及尺寸', '价格及尺寸'], 'Deposit policy': ['按金政策', '押金政策'], 'Pickup areas': ['收送範圍', '收送范围'], 'What can I store?': ['可以存放甚麼？', '可以存放什么？'],
 };
 export function translate(lang: Lang, s: string) {
