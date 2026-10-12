@@ -271,3 +271,211 @@ export const locations = [
     km: 24.3,
   },
 ];
+
+// Shared inbox fixtures. These are demo records, never live WhatsApp data.
+export function createSupportConversations(
+  now = Date.now(),
+): import("../lib/support-types").SupportConversation[] {
+  const minutes = (n: number) => now - n * 60_000;
+  return [
+    {
+      id: "wa-mandy",
+      customer: "Mandy Ho",
+      contact: "+852 •••• 2048",
+      channel: "whatsapp",
+      status: "needs_staff",
+      assignee: "",
+      subject: "Change my pickup time",
+      summary:
+        "Mandy would like to move her six-box pickup to the afternoon. A reply was sent from the company phone; the new time still needs checking.",
+      bookingId: "BK-1058",
+      lastCustomerAt: minutes(4),
+      unread: true,
+      messages: [
+        {
+          id: "mandy-1",
+          source: "customer",
+          author: "Mandy Ho",
+          text: "Hi! Could we move my pickup to the afternoon? I have 6 boxes ready.",
+          at: minutes(18),
+        },
+        {
+          id: "mandy-2",
+          source: "phone",
+          author: "Company phone",
+          text: "Hi Mandy, let me check the afternoon schedule with our team.",
+          at: minutes(13),
+          delivery: "simulated",
+        },
+        {
+          id: "mandy-3",
+          source: "customer",
+          author: "Mandy Ho",
+          text: "Thank you! Anything after 2 pm would be perfect.",
+          at: minutes(4),
+        },
+      ],
+    },
+    {
+      id: "web-ana",
+      threadId: "support-ana",
+      customer: "Ana Lee",
+      contact: "Website visitor · demo",
+      channel: "website",
+      status: "needs_staff",
+      assignee: "",
+      subject: "Return only two of my boxes",
+      summary:
+        "Ana wants two of her twelve boxes returned. The bot could explain delivery but could not arrange a partial retrieval. Staff needs to confirm the box IDs and available date.",
+      bookingId: "BK-1060",
+      lastCustomerAt: minutes(9),
+      unread: true,
+      messages: [
+        {
+          id: "ana-1",
+          source: "customer",
+          author: "Ana Lee",
+          text: "Can I get just 2 of my 12 boxes back this week?",
+          at: minutes(12),
+        },
+        {
+          id: "ana-2",
+          source: "bot",
+          author: "STORAGE bot",
+          text: "We offer scheduled return deliveries. I’ll need our team to help arrange a partial retrieval.",
+          at: minutes(11),
+        },
+        {
+          id: "ana-3",
+          source: "customer",
+          author: "Ana Lee",
+          text: "Yes please, can someone help me arrange it?",
+          at: minutes(9),
+        },
+        {
+          id: "ana-4",
+          source: "system",
+          author: "System",
+          text: "Customer requested staff. Bot paused.",
+          at: minutes(9),
+        },
+      ],
+    },
+    {
+      id: "wa-jason",
+      customer: "Jason Wong",
+      contact: "+852 •••• 6183",
+      channel: "whatsapp",
+      status: "human",
+      assignee: "Sarah Chan",
+      subject: "Payment confirmation",
+      summary:
+        "Jason has sent his FPS payment and is waiting for the team to confirm receipt. Payment is still pending in the booking record.",
+      bookingId: "BK-1059",
+      lastCustomerAt: minutes(42),
+      unread: false,
+      messages: [
+        {
+          id: "jason-1",
+          source: "customer",
+          author: "Jason Wong",
+          text: "I just paid by FPS. Can you check if it arrived?",
+          at: minutes(42),
+        },
+        {
+          id: "jason-2",
+          source: "staff",
+          author: "Sarah Chan",
+          text: "Of course, Jason. I’m checking with our payments team now.",
+          at: minutes(38),
+          delivery: "simulated",
+        },
+        {
+          id: "jason-3",
+          source: "note",
+          author: "Sarah Chan",
+          text: "Please verify the bank transaction before marking the booking paid.",
+          at: minutes(37),
+        },
+      ],
+    },
+    {
+      id: "wa-leo",
+      customer: "Leo Chan",
+      contact: "+852 •••• 7726",
+      channel: "whatsapp",
+      status: "needs_staff",
+      assignee: "",
+      subject: "Deposit follow-up",
+      summary:
+        "Leo asked about his deposit two days ago. The WhatsApp reply window has expired; use the example template to demonstrate a follow-up.",
+      bookingId: "BK-1061",
+      lastCustomerAt: minutes(2880),
+      unread: false,
+      messages: [
+        {
+          id: "leo-1",
+          source: "customer",
+          author: "Leo Chan",
+          text: "Could you update me on my deposit refund please?",
+          at: minutes(2880),
+        },
+      ],
+    },
+    {
+      id: "web-nicole",
+      threadId: "support-nicole",
+      customer: "Nicole Tam",
+      contact: "Website visitor · demo",
+      channel: "website",
+      status: "resolved",
+      assignee: "Alex Wong",
+      subject: "Cancellation confirmed",
+      summary:
+        "Nicole asked whether her cancellation was complete. Alex confirmed the booking status and refund.",
+      bookingId: "BK-1062",
+      lastCustomerAt: minutes(120),
+      unread: false,
+      messages: [
+        {
+          id: "nicole-1",
+          source: "customer",
+          author: "Nicole Tam",
+          text: "Has my booking been cancelled?",
+          at: minutes(120),
+        },
+        {
+          id: "nicole-2",
+          source: "staff",
+          author: "Alex Wong",
+          text: "Yes, your booking BK-1062 is cancelled and the payment has been refunded.",
+          at: minutes(115),
+          delivery: "simulated",
+        },
+        {
+          id: "nicole-3",
+          source: "system",
+          author: "System",
+          text: "Alex Wong resolved this conversation.",
+          at: minutes(114),
+        },
+      ],
+    },
+  ];
+}
+export const supportStaff = ["Sarah Chan", "Alex Wong"];
+export const supportQuickReplies = [
+  {
+    label: "Acknowledge",
+    text: "Thanks for getting in touch. I’m checking this for you and will reply here shortly.",
+  },
+  {
+    label: "Ask for box IDs",
+    text: "Of course! Could you share the IDs of the boxes you would like returned, and your preferred delivery date?",
+  },
+  { label: "繁體中文", text: "你好！我們已收到你的查詢，正在為你跟進，稍後會在這裡回覆。" },
+];
+export const supportFollowupTemplate =
+  "Hello! Our storage team is following up on your support request. Please reply here so we can continue helping you.";
+export const supportPhoneReply =
+  "I’m following up from our company phone. Our team is checking this for you.";

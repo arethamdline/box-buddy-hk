@@ -28,6 +28,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
+import { handoffThread, sendWebsiteMessage, useSupport } from "@/lib/support-store";
+import { statusLabels } from "@/lib/support-types";
+
 type Thread = { id: string; title: string; updated: string; messages: UIMessage[] };
 const defaults: Thread[] = [
   {
@@ -120,7 +123,27 @@ function AssistantPage() {
   const [hydrated, setHydrated] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const active = threads.find((t) => t.id === threadId) ?? threads[0];
+  const {
+    conversations: supportConversations,
+    error: supportError,
+    ready: supportReady,
+  } = useSupport();
+  const support = supportConversations.find((c) => c.threadId === threadId);
+  const savedActive = threads.find((t) => t.id === threadId) ?? threads[0];
+  const active: Thread | undefined = support
+    ? {
+        id: threadId,
+        title: support.subject,
+        updated: "Now",
+        messages: support.messages
+          .filter((m) => !["note", "system"].includes(m.source))
+          .map((m) => ({
+            id: m.id,
+            role: m.source === "customer" ? "user" : "assistant",
+            parts: [{ type: "text", text: m.text }],
+          })),
+      }
+    : savedActive;
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE);
@@ -150,6 +173,10 @@ function AssistantPage() {
   };
   const send = (text: string) => {
     if (!text.trim() || !active) return;
+    if (support) {
+      sendWebsiteMessage(support.id, text, reply(text));
+      return;
+    }
     const now = Date.now();
     setThreads((ts) =>
       ts.map((t) =>
@@ -190,6 +217,12 @@ function AssistantPage() {
     setThreads((ts) => [t, ...ts]);
     navigate({ to: "/assistant/$threadId", params: { threadId: id } });
   };
+  if (!hydrated || !supportReady)
+    return (
+      <CustomerShell>
+        <p className="p-8 text-center text-sm text-muted-foreground">Loading your conversation…</p>
+      </CustomerShell>
+    );
   if (!active) return null;
   return (
     <CustomerShell>
@@ -235,7 +268,11 @@ function AssistantPage() {
                 <Package />
               </span>
               <div className="min-w-0">
-                <h1 className="truncate font-display font-bold">STORAGE assistant</h1>
+                <h1 className="truncate font-display font-bold">
+                  {support && support.status !== "bot"
+                    ? "STORAGE support team"
+                    : "STORAGE assistant"}
+                </h1>
                 <p className="flex items-center gap-1 text-xs text-success-strong">
                   <span className="size-2 rounded-full bg-success-strong" />
                   English · 繁體中文
@@ -246,6 +283,25 @@ function AssistantPage() {
               <MessageSquarePlus />
             </Button>
           </header>
+          {supportError && (
+            <p role="alert" className="bg-warning-soft p-3 text-xs text-warning-strong">
+              {supportError}
+            </p>
+          )}
+          {support && (
+            <div className="border-b bg-info-soft/40 px-4 py-3 text-xs" role="status">
+              <strong>{statusLabels[support.status]}</strong>
+              <span className="ml-2">
+                {support.status === "needs_staff"
+                  ? "Your conversation is with our team. You can keep messaging here."
+                  : support.status === "human"
+                    ? `${support.assignee || "Our team"} is helping you here. The bot is paused.`
+                    : support.status === "resolved"
+                      ? "This request is resolved. Send a message if you need more help."
+                      : "The bot is back. You can ask for our team again anytime."}
+              </span>
+            </div>
+          )}
           <Conversation className="min-h-0">
             <ConversationContent className="mx-auto w-full max-w-3xl gap-6 px-4 py-8">
               {active.messages.map((m) => (
@@ -253,12 +309,21 @@ function AssistantPage() {
                   <div className="flex items-start gap-3">
                     {m.role === "assistant" && (
                       <span className="grid size-8 shrink-0 place-items-center rounded-md bg-accent text-primary">
-                        <Bot className="size-4" />
+                        {support?.messages.find((item) => item.id === m.id)?.source === "staff" ? (
+                          <UserRound className="size-4" />
+                        ) : (
+                          <Bot className="size-4" />
+                        )}
                       </span>
                     )}
                     <MessageContent
                       className={m.role === "user" ? "bg-primary text-primary-foreground" : ""}
                     >
+                      {support?.messages.find((item) => item.id === m.id)?.source === "staff" && (
+                        <p className="mb-1 text-xs font-semibold text-primary">
+                          {support.messages.find((item) => item.id === m.id)?.author} · Support team
+                        </p>
+                      )}
                       {m.parts.map((p, i) =>
                         p.type === "text" ? (
                           <MessageResponse key={i}>{p.text}</MessageResponse>
@@ -277,22 +342,42 @@ function AssistantPage() {
           <div className="border-t bg-background p-3">
             <div className="mx-auto max-w-3xl">
               <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
-                {["Prices & sizes", "Deposit policy", "Pickup areas", "可存放物品"].map((q) => (
-                  <Button
-                    key={q}
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0"
-                    onClick={() => send(q)}
-                  >
-                    {q}
-                  </Button>
-                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  disabled={
+                    !supportReady ||
+                    (!!support && ["needs_staff", "human"].includes(support.status))
+                  }
+                  onClick={() => handoffThread(active)}
+                >
+                  <UserRound />
+                  {support && ["needs_staff", "human"].includes(support.status)
+                    ? "Team notified"
+                    : "Talk to staff"}
+                </Button>
+                {(!support || support.status === "bot") &&
+                  ["Prices & sizes", "Deposit policy", "Pickup areas", "可存放物品"].map((q) => (
+                    <Button
+                      key={q}
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={() => send(q)}
+                    >
+                      {q}
+                    </Button>
+                  ))}
               </div>
               <PromptInput onSubmit={(m) => send(m.text)}>
                 <PromptInputTextarea
                   ref={inputRef}
-                  placeholder="Ask about storage… / 查詢迷你倉服務…"
+                  placeholder={
+                    support && support.status !== "bot"
+                      ? "Message our team… / 聯絡職員…"
+                      : "Ask about storage… / 查詢迷你倉服務…"
+                  }
                 />
                 <PromptInputFooter>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -303,7 +388,7 @@ function AssistantPage() {
                 </PromptInputFooter>
               </PromptInput>
               <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                Sample answers for prototype use only
+                Prototype · chat saved in this browser · no live support connected
               </p>
             </div>
           </div>
